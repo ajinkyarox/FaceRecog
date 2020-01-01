@@ -7,7 +7,7 @@ class  EmpList  extends  Component {
     constructor(props) {
         super(props);
         this.state  = {
-            employeeDet: ''
+            employeeDet: []
             //nextPageURL:  ''
         };
         //this.nextPage  =  this.nextPage.bind(this);
@@ -16,9 +16,29 @@ class  EmpList  extends  Component {
 
     render() {
 
-        return (<div>
-          {this.state.employeeDet}
-        </div>);
+        return ( <div>
+        <table  className="table">
+            <thead  key="thead">
+            <tr>
+                <th>Emp ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                
+            </tr>
+            </thead>
+            <tbody>
+                {this.state.employeeDet.map( c  =>
+                <tr  key={c.emp_id}>
+                    <td>{c.emp_id}  </td>
+                    <td>{c.firstname}</td>
+                    <td>{c.lastname}</td>
+                    
+                    
+                </tr>)}
+            </tbody>
+        </table>
+        
+    </div>);
     }
     componentDidMount() {
         var  self  =  this;

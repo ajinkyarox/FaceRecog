@@ -7,14 +7,14 @@ import { Route } from  'react-router-dom'
 
 const BaseLayout = () => (
   <div className="content">
-      <Route path="/" exact component={EmpList} />
+      <Route path="/EmpList" exact component={EmpList} />
     </div>
 )
 
 function App() {
   return (
     <div>
-      <h1>Hello React!</h1>
+      <h1>FaceRecog</h1>
       <h2>
       <BrowserRouter>
         <BaseLayout/>
