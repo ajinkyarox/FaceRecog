@@ -12,6 +12,7 @@ const BaseLayout = () => (
 )
 
 function App() {
+  
   return (
     <div>
       <h1>FaceRecog</h1>

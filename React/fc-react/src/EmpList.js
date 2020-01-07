@@ -1,7 +1,8 @@
 import  EmployeeDetails  from  './EmployeeDetails';
 import React,{ Component } from  'react';
 import { Button} from 'react-bootstrap';
-
+import PopJS from './Popup';
+import Popup from "reactjs-popup";
 
 const  employeeDetails  =  new  EmployeeDetails();
 
@@ -13,16 +14,19 @@ class  EmpList  extends  Component {
         super(props);
         
         this.state  = {
-            employeeDet: []
+            employeeDet: [],
+            showPopup: false
             //nextPageURL:  ''
         };
         //this.nextPage  =  this.nextPage.bind(this);
         //this.handleDelete  =  this.handleDelete.bind(this);
     }
-     addNewEmployee() {
-        console.log('Add New Employee');
-      
+    togglePopup() {
+        this.setState({
+          showPopup: false 
+        });
       }
+     
 
     render() {
 
@@ -49,7 +53,18 @@ class  EmpList  extends  Component {
                 </tr>)}
             </tbody>
         </table>
-        <Button variant="contained" color="primary" onClick={this.addNewEmployee}>Add</Button>
+    
+        
+        
+       
+        
+        <Popup trigger={<button onClick={this.togglePopup.bind(this)}>show popup</button>} position="right center">
+          <PopJS
+            text='Close Me'
+            closePopup={this.togglePopup.bind(this)}
+          />
+          </Popup>
+      
     </div>);
     }
     componentDidMount() {
