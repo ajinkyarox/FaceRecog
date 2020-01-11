@@ -40,3 +40,60 @@ def addEmployee(request):
     else:
         response={'status':'Failure','responseObject':None}
     return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def updateEmployee(request):
+    response = ''
+    newemp = EmpDetails()
+    try:
+        if request.method == "PUT":
+            response = 'Success'
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+
+            if EmpDetails.objects.get(id=body_data['id']) != None:
+                newemp.firstname = body_data['firstname']
+                newemp.lastname = body_data['lastname']
+                newemp.save()
+                print(newemp.id)
+                newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
+                response = {'status': 'Success', 'responseObject': newemp}
+
+            else:
+                print("Does not exist.")
+                newemp = None
+                response = {'status': 'Failure', 'responseObject': None}
+
+        else:
+            response = {'status': 'Failure', 'responseObject': None}
+    except:
+        print("There is some problem.")
+        response = {'status': 'Failure', 'responseObject': None}
+    return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def deleteEmployee(request):
+    response = ''
+    newemp = EmpDetails()
+    try:
+        if request.method == "DELETE":
+            response = 'Success'
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+            if EmpDetails.objects.get(id=body_data['id']) != None:
+                newemp=EmpDetails.objects.get(id=body_data['id'])
+                newemp.delete()
+                response = {'status': 'Success', 'responseObject': None}
+            else:
+                newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
+                response = {'status': 'Failure', 'responseObject': newemp}
+        else:
+            response = {'status': 'Failure', 'responseObject': None}
+
+    except:
+        print("There's something wrong")
+        newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
+        response = {'status': 'Failure', 'responseObject': newemp}
+    return JsonResponse(response, safe=False)

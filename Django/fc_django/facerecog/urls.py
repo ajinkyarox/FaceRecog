@@ -6,6 +6,9 @@ from .views import *
 urlpatterns = [
     path('', homePageView, name='home'),
     path('empdetails', getEmpDetails, name='getEmpDetails'),
-    path('addEmployee', addEmployee, name='addEmployee')
+    path('addEmployee', addEmployee, name='addEmployee'),
+    path('updateEmployee', updateEmployee, name='updateEmployee'),
+    path('deleteEmployee', deleteEmployee, name='deleteEmployee')
+
 ]
 
