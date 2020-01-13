@@ -1,7 +1,6 @@
 import  EmployeeDetails  from  './EmployeeDetails';
 import React,{ Component } from  'react';
 import { Button} from 'react-bootstrap';
-import PopJS from './Popup';
 import Popup from "reactjs-popup";
 
 const  employeeDetails  =  new  EmployeeDetails();
@@ -15,9 +14,13 @@ class  EmpList  extends  Component {
         
         this.state  = {
             employeeDet: [],
-            showPopup: false
-            //nextPageURL:  ''
+            showPopup: false,
+            firstname: '',lastname: ''
+            
         };
+        this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
+this.handleLastNameChange=this.handleLastNameChange.bind(this);
+this.handleSubmit = this.handleSubmit.bind(this);
         //this.nextPage  =  this.nextPage.bind(this);
         //this.handleDelete  =  this.handleDelete.bind(this);
     }
@@ -26,6 +29,40 @@ class  EmpList  extends  Component {
           showPopup: false 
         });
       }
+
+      handleFirstNameChange(event) {
+        this.setState({firstname: event.target.value});
+      }
+    
+      handleLastNameChange(event){
+        this.setState({lastname: event.target.value});
+      }
+    
+      handleSubmit(event) {
+        console.log("POSTING")
+        fetch('http://localhost:8000/addEmployee', {
+      method: 'POST',
+      body: JSON.stringify({
+        firstname: this.state.firstname,
+        lastname: this.state.lastname,
+      })
+      
+    }).then((response) => {
+        return response.json() // << This is the problem
+     })
+     .then((responseData) => { // responseData = undefined
+         alert(responseData.status);
+         window.location.reload(true);
+         return responseData;
+     })
+   .catch(function(err) {
+       console.log(err);
+   })
+    console.log("POST")
+   
+   // 
+      }
+
      
 
     render() {
@@ -58,11 +95,20 @@ class  EmpList  extends  Component {
         
        
         
-        <Popup trigger={<button onClick={this.togglePopup.bind(this)}>show popup</button>} position="right center">
-          <PopJS
-            text='Close Me'
-            closePopup={this.togglePopup.bind(this)}
-          />
+        <Popup trigger={<button onClick={this.togglePopup.bind(this)}>Add Employee</button>} position="right center">
+        <div>
+        <label>
+          Fisrt Name:
+          <input type="text" value={this.state.firstname} onChange={this.handleFirstNameChange} />
+        </label>
+        <br></br>
+        <label>
+          Last Name:
+          <input type="text" value={this.state.lastname} onChange={this.handleLastNameChange} />
+        </label>
+        <br></br>
+<button onClick={this.handleSubmit}>Add</button>
+      </div>
           </Popup>
       
     </div>);
