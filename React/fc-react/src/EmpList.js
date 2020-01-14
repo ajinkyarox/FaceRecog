@@ -30,7 +30,10 @@ this.handleSubmit = this.handleSubmit.bind(this);
         });
       }
 
+
+      
       handleFirstNameChange(event) {
+        
         this.setState({firstname: event.target.value});
       }
     
@@ -64,6 +67,32 @@ this.handleSubmit = this.handleSubmit.bind(this);
       }
 
      
+      handleUpdateSubmit(event) {
+        console.log("PUTTING")
+        fetch('http://localhost:8000/updateEmployee', {
+      method: 'PUT',
+      body: JSON.stringify({
+        //id:,
+        firstname: this.state.firstname,
+        lastname: this.state.lastname
+      })
+      
+    }).then((response) => {
+        return response.json() // << This is the problem
+     })
+     .then((responseData) => { // responseData = undefined
+         alert(responseData.status);
+         window.location.reload(true);
+         return responseData;
+     })
+   .catch(function(err) {
+       console.log(err);
+   })
+    console.log("PUT")
+   
+   // 
+      }
+
 
     render() {
 
@@ -84,7 +113,26 @@ this.handleSubmit = this.handleSubmit.bind(this);
                     <td>{c.firstname}</td>
                     <td>{c.lastname}</td>
                     <td>
-                        <Button variant="contained" color="primary">Update</Button> &nbsp;
+                    <Popup trigger={<button onClick={this.togglePopup.bind(this)}>Update Employee</button>} position="right center">
+        <div>
+        <label>
+          ID:
+          <input readOnly="readOnly" type="text" value={c.id}  />
+        </label>
+        <br></br>
+        <label>
+          Fisrt Name:
+          <input type="text" value={c.firstname} onChange={this.handleFirstNameChange} />
+        </label>
+        <br></br>
+        <label>
+          Last Name:
+          <input type="text" value={c.lastname} onChange={this.handleLastNameChange} />
+        </label>
+        <br></br>
+<button onClick={this.handleUpdateSubmit}>Update</button>
+      </div>
+          </Popup> &nbsp;
                         <Button variant="contained" color="primary">Delete</Button>
                     </td>
                 </tr>)}
