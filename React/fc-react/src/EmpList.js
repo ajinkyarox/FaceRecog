@@ -15,7 +15,7 @@ class  EmpList  extends  Component {
         this.state  = {
             employeeDet: [],
             showPopup: false,
-            firstname: '',lastname: ''
+            firstname: '',lastname: '',ufname: '',ulname:''
             
         };
         this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
@@ -67,14 +67,13 @@ this.handleSubmit = this.handleSubmit.bind(this);
       }
 
      
-      handleUpdateSubmit(event) {
-        console.log("PUTTING")
+      handleUpdateSubmit(event,eid,fname,lname) {
         fetch('http://localhost:8000/updateEmployee', {
       method: 'PUT',
       body: JSON.stringify({
-        //id:,
-        firstname: this.state.firstname,
-        lastname: this.state.lastname
+        id:eid,
+        firstname: fname,
+        lastname: lname
       })
       
     }).then((response) => {
@@ -93,7 +92,15 @@ this.handleSubmit = this.handleSubmit.bind(this);
    // 
       }
 
-
+handleInputFNameChange(event,id){
+  //param:event.target.value;
+  this.setState({ufname: event.target.value }); 
+  
+}
+handleInputLNameChange(event,id){
+  //param:event.target.value;
+  this.setState({ulname : event.target.value }); 
+}
     render() {
 
         return ( <div>
@@ -122,15 +129,15 @@ this.handleSubmit = this.handleSubmit.bind(this);
         <br></br>
         <label>
           Fisrt Name:
-          <input type="text" value={c.firstname} onChange={this.handleFirstNameChange} />
+          <input type="text"  onChange={(e)=>this.handleInputFNameChange(e,c.id) } />
         </label>
         <br></br>
         <label>
           Last Name:
-          <input type="text" value={c.lastname} onChange={this.handleLastNameChange} />
+          <input type="text"  onChange={(e)=>this.handleInputLNameChange(e,c.id) } />
         </label>
         <br></br>
-<button onClick={this.handleUpdateSubmit}>Update</button>
+<button onClick={(e)=>this.handleUpdateSubmit(e,c.id,this.state.ufname,this.state.ulname) }>Update</button>
       </div>
           </Popup> &nbsp;
                         <Button variant="contained" color="primary">Delete</Button>

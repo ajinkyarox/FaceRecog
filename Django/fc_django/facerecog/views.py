@@ -30,13 +30,15 @@ def addEmployee(request):
             print("Duplicate")
             newemp=None
             response = {'status': 'Failure', 'responseObject': newemp}
-        else:
+        elif body_data['firstname'].strip()!="" and body_data['lastname'].strip()!="":
 
             newemp.save()
             newemp=EmpDetails.objects.filter(firstname=body_data['firstname'],lastname=body_data['lastname']).first()
             print(newemp.id)
             newemp={'id':newemp.id,'firstname':newemp.firstname,'lastname':newemp.lastname}
             response={'status':'Success','responseObject':newemp}
+        else:
+            response = {'status': 'Failure', 'responseObject': None}
     else:
         response={'status':'Failure','responseObject':None}
     return JsonResponse(response, safe=False)
@@ -52,14 +54,15 @@ def updateEmployee(request):
             body_data = json.loads(body_unicode)
 
 
-            if EmpDetails.objects.get(id=body_data['id']) != None:
-                newemp.firstname = body_data['firstname']
-                newemp.lastname = body_data['lastname']
-                newemp.save()
-                print(newemp.id)
-                newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
-                response = {'status': 'Success', 'responseObject': newemp}
-
+            if EmpDetails.objects.get(id=body_data['id']) != None and body_data['firstname'].strip()!="" and body_data['lastname'].strip()!="":
+                #newemp.firstname = body_data['firstname']
+                #newemp.lastname = body_data['lastname']
+                newemp=EmpDetails.objects.filter(id=body_data['id']).update(firstname=body_data['firstname'],lastname=body_data['lastname'])
+                #newemp.save(update_fields=["active"])
+                #print(newemp.id)
+                #newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
+                response = {'status': 'Success', 'responseObject': None}
+                print("Success")
             else:
                 print("Does not exist.")
                 newemp = None
