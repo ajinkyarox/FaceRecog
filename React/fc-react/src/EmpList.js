@@ -31,7 +31,25 @@ this.handleSubmit = this.handleSubmit.bind(this);
       }
 
 
+      handleDeleteSubmit(id){
+        fetch('http://localhost:8000/deleteEmployee?id='+id, {
+      method: 'DELETE',
       
+      
+    }).then((response) => {
+        return response.json() // << This is the problem
+     })
+     .then((responseData) => { // responseData = undefined
+         alert(responseData.status);
+         window.location.reload(true);
+         return responseData;
+     })
+   .catch(function(err) {
+       console.log(err);
+   })
+ 
+      }
+
       handleFirstNameChange(event) {
         
         this.setState({firstname: event.target.value});
@@ -140,7 +158,7 @@ handleInputLNameChange(event,id){
 <button onClick={(e)=>this.handleUpdateSubmit(e,c.id,this.state.ufname,this.state.ulname) }>Update</button>
       </div>
           </Popup> &nbsp;
-                        <Button variant="contained" color="primary">Delete</Button>
+          <button onClick={(e)=>this.handleDeleteSubmit(c.id) }>Delete</button>
                     </td>
                 </tr>)}
             </tbody>

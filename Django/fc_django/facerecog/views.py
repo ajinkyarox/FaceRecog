@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from facerecog.models import EmpDetails
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.http import QueryDict
 import json
 
 def homePageView(request):
@@ -79,24 +79,25 @@ def updateEmployee(request):
 def deleteEmployee(request):
     response = ''
     newemp = EmpDetails()
+
     try:
         if request.method == "DELETE":
             response = 'Success'
-            body_unicode = request.body.decode('utf-8')
-            body_data = json.loads(body_unicode)
-
-            if EmpDetails.objects.get(id=body_data['id']) != None:
-                newemp=EmpDetails.objects.get(id=body_data['id'])
+            #body_unicode = request.body.decode('utf-8')
+            #body_data = json.loads(body_unicode)
+            id = request.GET['id']
+            if EmpDetails.objects.get(id=id) != None:
+                newemp=EmpDetails.objects.get(id=id)
                 newemp.delete()
                 response = {'status': 'Success', 'responseObject': None}
             else:
-                newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
-                response = {'status': 'Failure', 'responseObject': newemp}
+                #newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
+                response = {'status': 'Failure', 'responseObject': None}
         else:
             response = {'status': 'Failure', 'responseObject': None}
 
     except:
         print("There's something wrong")
-        newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
-        response = {'status': 'Failure', 'responseObject': newemp}
+        #newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
+        response = {'status': 'Failure', 'responseObject': None}
     return JsonResponse(response, safe=False)
