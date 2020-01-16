@@ -1,6 +1,6 @@
 # pages/views.py
 from django.http import HttpResponse
-from facerecog.models import EmpDetails
+from facerecog.models import EmpDetails,Photos
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import QueryDict
@@ -101,3 +101,36 @@ def deleteEmployee(request):
         #newemp = {'id': newemp.id, 'firstname': newemp.firstname, 'lastname': newemp.lastname}
         response = {'status': 'Failure', 'responseObject': None}
     return JsonResponse(response, safe=False)
+
+@csrf_exempt
+def savePhoto(request):
+    response=''
+    if request.method == "POST":
+        try:
+
+            body_unicode = request.body.decode('utf-8')
+            body_data = json.loads(body_unicode)
+
+            if EmpDetails.objects.get(id=body_data['id']) != None:
+                photo = Photos(
+                    photo=body_data['photo'],
+                    id=EmpDetails.objects.get(id=body_data['id']).id
+                )
+
+
+
+                photo.save()
+
+                photo=Photos.objects.get(photo=photo.photo)
+                photo = {'pid': photo.pid, 'photo': photo.photo, 'id': photo.id}
+                response = {'status': 'Success', 'responseObject': photo}
+            else:
+                print("Else")
+                response = {'status': 'Failure', 'responseObject': None}
+        except Exception as e:
+            print("PROBLEM"+str(e))
+            response = {'status': 'Failure', 'responseObject': None}
+    else:
+        response = {'status': 'Failure', 'responseObject': "Not Allowed"}
+    return JsonResponse(response)
+

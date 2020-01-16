@@ -8,3 +8,11 @@ class EmpDetails(models.Model):
 
     class Meta:
         db_table = "EmpDetails"
+
+class Photos(models.Model):
+    pid = models.AutoField(primary_key=True)
+    id = models.IntegerField()
+    photo=models.CharField(max_length=65535)
+
+    class Meta:
+        db_table = "Photos"
