@@ -110,10 +110,11 @@ def savePhoto(request):
 
             body_unicode = request.body.decode('utf-8')
             body_data = json.loads(body_unicode)
-
+            arr=body_data['photo'].split(",")
+            print(arr[1])
             if EmpDetails.objects.get(id=body_data['id']) != None:
                 photo = Photos(
-                    photo=body_data['photo'],
+                    photo=arr[1],
                     id=EmpDetails.objects.get(id=body_data['id']).id
                 )
 
@@ -121,9 +122,8 @@ def savePhoto(request):
 
                 photo.save()
 
-                photo=Photos.objects.get(photo=photo.photo)
-                photo = {'pid': photo.pid, 'photo': photo.photo, 'id': photo.id}
-                response = {'status': 'Success', 'responseObject': photo}
+
+                response = {'status': 'Success', 'responseObject': None}
             else:
                 print("Else")
                 response = {'status': 'Failure', 'responseObject': None}

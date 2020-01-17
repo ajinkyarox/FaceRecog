@@ -1,6 +1,5 @@
 import  EmployeeDetails  from  './EmployeeDetails';
 import React,{ Component } from  'react';
-import { Button} from 'react-bootstrap';
 import Popup from "reactjs-popup";
 
 const  employeeDetails  =  new  EmployeeDetails();
@@ -18,6 +17,7 @@ class  EmpList  extends  Component {
             firstname: '',lastname: '',ufname: '',ulname:''
             
         };
+        this.imgPass=this.imgPass.bind(this)
         this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
 this.handleLastNameChange=this.handleLastNameChange.bind(this);
 this.handleSubmit = this.handleSubmit.bind(this);
@@ -110,6 +110,68 @@ this.handleSubmit = this.handleSubmit.bind(this);
    // 
       }
 
+
+      maxSelectFile=(event)=>{
+        let files = event.target.files // create file object
+            if (files.length > 1) { 
+               const msg = 'Only 1 images can be uploaded at a time'
+               event.target.value = null // discard selected file
+               console.log(msg)
+              return false;
+     
+          }
+        return true;
+     
+     }
+
+      imgPass(event,eid){
+        if(this.maxSelectFile(event) && (event.target.files[0].name.includes(".jpg") || event.target.files[0].name.includes(".png"))){
+          console.log(event.target.files[0])
+          let idCardBase64 = '';
+          
+          this.getBase64(event.target.files[0], (result) => {
+               idCardBase64 = result;
+               fetch('http://localhost:8000/savePhoto', {
+                method: 'POST',
+                body: JSON.stringify({
+                  id: eid,
+                  photo: idCardBase64,
+                })
+                
+              }).then((response) => {
+                  return response.json() // << This is the problem
+               })
+               .then((responseData) => { // responseData = undefined
+                   alert(responseData.status);
+                   idCardBase64=null
+                   window.location.reload(true);
+                   return responseData;
+               })
+             .catch(function(err) {
+                 console.log(err);
+             })
+          });
+          console.log(idCardBase64)
+        }
+        else{
+          alert("Incompatible file type")
+          window.location.reload(true);
+        }
+
+}
+
+getBase64(file, cb) {
+  let reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = function () {
+      cb(reader.result)
+  };
+  reader.onerror = function (error) {
+      console.log('Error: ', error);
+  };
+}
+      
+
 handleInputFNameChange(event,id){
   //param:event.target.value;
   this.setState({ufname: event.target.value }); 
@@ -129,6 +191,7 @@ handleInputLNameChange(event,id){
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Update/Delete</th>
+                <th>Adding Photo</th>
             </tr>
             </thead>
             <tbody>
@@ -139,6 +202,7 @@ handleInputLNameChange(event,id){
                     <td>{c.lastname}</td>
                     <td>
                     <Popup trigger={<button onClick={this.togglePopup.bind(this)}>Update Employee</button>} position="right center">
+                    
         <div>
         <label>
           ID:
@@ -158,8 +222,8 @@ handleInputLNameChange(event,id){
 <button onClick={(e)=>this.handleUpdateSubmit(e,c.id,this.state.ufname,this.state.ulname) }>Update</button>
       </div>
           </Popup> &nbsp;
-          <button onClick={(e)=>this.handleDeleteSubmit(c.id) }>Delete</button>
-                    </td>
+          <button onClick={(e)=>this.handleDeleteSubmit(c.id) }>Delete</button></td>
+         <td> <input type="file" name="file" onChange={(e)=>this.imgPass(e,c.id)}/> </td>
                 </tr>)}
             </tbody>
         </table>
