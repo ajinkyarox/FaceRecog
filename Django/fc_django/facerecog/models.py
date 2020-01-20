@@ -9,10 +9,10 @@ class EmpDetails(models.Model):
     class Meta:
         db_table = "EmpDetails"
 
-class Photos(models.Model):
-    pid = models.AutoField(primary_key=True)
-    id = models.IntegerField()
-    photo=models.CharField(max_length=65535)
+class Attendance(models.Model):
+    eid = models.AutoField(primary_key=True)
+    attendance = models.IntegerField()
+    datetime = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = "Photos"
+        db_table = "Attendance"

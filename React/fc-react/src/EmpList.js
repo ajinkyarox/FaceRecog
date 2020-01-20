@@ -1,12 +1,22 @@
 import  EmployeeDetails  from  './EmployeeDetails';
 import React,{ Component } from  'react';
 import Popup from "reactjs-popup";
-
+import Webcam from "react-webcam";
+ 
 const  employeeDetails  =  new  EmployeeDetails();
 
-
+const videoConstraints = {
+  width: 1280,
+  height: 720,
+  facingMode: "user"
+};
 
 class  EmpList  extends  Component {
+
+  setRef = webcam => {
+    this.webcam = webcam;
+  };
+
 
     constructor(props) {
         super(props);
@@ -125,17 +135,18 @@ this.handleSubmit = this.handleSubmit.bind(this);
      }
 
       imgPass(event,eid){
-        if(this.maxSelectFile(event) && (event.target.files[0].name.includes(".jpg") || event.target.files[0].name.includes(".png"))){
-          console.log(event.target.files[0])
+        if(this.maxSelectFile(event) && ( event.target.files[0].name.includes(".JPG") || event.target.files[0].name.includes(".jpg") || event.target.files[0].name.includes(".png") || event.target.files[0].name.includes(".PNG") )){
+          console.log(event.target.files[0].name)
           let idCardBase64 = '';
-          
-          this.getBase64(event.target.files[0], (result) => {
+          let name=event.target.files[0].name
+          this.getBase64(event.target.files[0],name, (result) => {
                idCardBase64 = result;
                fetch('http://localhost:8000/savePhoto', {
                 method: 'POST',
                 body: JSON.stringify({
                   id: eid,
                   photo: idCardBase64,
+                  filename:name
                 })
                 
               }).then((response) => {
@@ -151,7 +162,7 @@ this.handleSubmit = this.handleSubmit.bind(this);
                  console.log(err);
              })
           });
-          console.log(idCardBase64)
+         // console.log(idCardBase64)
         }
         else{
           alert("Incompatible file type")
@@ -160,7 +171,7 @@ this.handleSubmit = this.handleSubmit.bind(this);
 
 }
 
-getBase64(file, cb) {
+getBase64(file,name, cb) {
   let reader = new FileReader();
   reader.readAsDataURL(file);
   reader.onload = function () {
@@ -171,6 +182,14 @@ getBase64(file, cb) {
   };
 }
       
+markAttendace(event){
+  const imageSrc = this.webcam.getScreenshot();
+
+
+
+
+
+}
 
 handleInputFNameChange(event,id){
   //param:event.target.value;
@@ -184,6 +203,19 @@ handleInputLNameChange(event,id){
     render() {
 
         return ( <div>
+          <div align="center">
+          <Popup trigger={<button >Mark Attendace</button>}>
+           <div>
+           <Webcam audio={false}
+        height={200}
+        ref={this.setRef}
+        screenshotFormat="image/jpeg"
+        width={200}
+        videoConstraints={videoConstraints}/><br></br>
+        <button onClick={e=>this.markAttendace(e)}>Mark</button>
+        </div>
+        </Popup>
+          </div>
         <table  className="table">
             <thead  key="thead">
             <tr>
@@ -192,6 +224,7 @@ handleInputLNameChange(event,id){
                 <th>Last Name</th>
                 <th>Update/Delete</th>
                 <th>Adding Photo</th>
+                
             </tr>
             </thead>
             <tbody>
@@ -224,6 +257,7 @@ handleInputLNameChange(event,id){
           </Popup> &nbsp;
           <button onClick={(e)=>this.handleDeleteSubmit(c.id) }>Delete</button></td>
          <td> <input type="file" name="file" onChange={(e)=>this.imgPass(e,c.id)}/> </td>
+         
                 </tr>)}
             </tbody>
         </table>

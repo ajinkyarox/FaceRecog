@@ -1,9 +1,12 @@
 # pages/views.py
+import os
+import base64
 from django.http import HttpResponse
-from facerecog.models import EmpDetails,Photos
+from facerecog.models import EmpDetails,Attendance
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import QueryDict
+from os import path
 import json
 
 def homePageView(request):
@@ -111,26 +114,37 @@ def savePhoto(request):
             body_unicode = request.body.decode('utf-8')
             body_data = json.loads(body_unicode)
             arr=body_data['photo'].split(",")
-            print(arr[1])
+
             if EmpDetails.objects.get(id=body_data['id']) != None:
-                photo = Photos(
-                    photo=arr[1],
-                    id=EmpDetails.objects.get(id=body_data['id']).id
-                )
+
+                cwdname=os.path.abspath(os.getcwd())+os.path.sep+"TrainingData"+os.path.sep+str(body_data['id'])
+                filepath = os.path.join(cwdname, body_data['filename'])
+                if not os.path.exists(cwdname):
+                    os.makedirs(cwdname)
+                if path.exists(filepath)==False:
+                    with open(filepath, "wb") as fh:
+                        fh.write(base64.decodebytes(arr[1].encode('utf-8')))
+                        response = {'status': 'Success', 'responseObject': None}
+                else:
+                    response = {'status': 'Failure', 'responseObject': None}
 
 
-
-                photo.save()
-
-
-                response = {'status': 'Success', 'responseObject': None}
             else:
                 print("Else")
                 response = {'status': 'Failure', 'responseObject': None}
         except Exception as e:
-            print("PROBLEM"+str(e))
+            print("PROBLEM.:-"+str(e))
             response = {'status': 'Failure', 'responseObject': None}
     else:
         response = {'status': 'Failure', 'responseObject': "Not Allowed"}
     return JsonResponse(response)
 
+@csrf_exempt
+def markAttendance(request):
+    resonse=''
+
+    return JsonResponse(resonse)
+
+def getAttendance(request):
+    data = list(Attendance.objects.values())
+    return JsonResponse(data, safe=False)
