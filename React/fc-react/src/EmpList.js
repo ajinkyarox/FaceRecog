@@ -184,8 +184,25 @@ getBase64(file,name, cb) {
       
 markAttendace(event){
   const imageSrc = this.webcam.getScreenshot();
-
-
+console.log(imageSrc)
+  fetch('http://localhost:8000/markAttendance', {
+    method: 'POST',
+    body: JSON.stringify({
+      photo: imageSrc,
+      
+    })
+    
+  }).then((response) => {
+      return response.json() // << This is the problem
+   })
+   .then((responseData) => { // responseData = undefined
+       alert(responseData.status);
+       window.location.reload(true);
+       return responseData;
+   })
+ .catch(function(err) {
+     console.log(err);
+ })
 
 
 

@@ -2,7 +2,7 @@
 import os
 import base64
 from django.http import HttpResponse
-from facerecog.models import EmpDetails,Attendance
+from .models import EmpDetails,Attendance
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import QueryDict
@@ -12,6 +12,10 @@ import cv2
 import numpy as np
 import re
 from re import search
+import datetime
+from datetime import date
+
+
 
 def homePageView(request):
     return HttpResponse('Hello from Django!')
@@ -152,12 +156,73 @@ def savePhoto(request):
 
 @csrf_exempt
 def markAttendance(request):
-    resonse=''
+    response = {'status': 'Failure', 'responseObject': None}
+    try:
 
-    return JsonResponse(resonse)
+        result=0
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        arr = body_data['photo'].split(",")
+        os.makedirs("Temp")
+        fp=os.path.abspath(os.getcwd())+os.path.sep+"Temp"
+        fp=os.path.join(fp, "temp.jpg")
+        with open(fp, "wb") as fh:
+            fh.write(base64.decodebytes(arr[1].encode('utf-8')))
+
+        test_img = cv2.imread(fp)  # test_img path
+        faces_detected, gray_img = faceDetection(test_img)
+        print("faces_detected:", faces_detected)
+        face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+        ids=EmpDetails.objects.values('id')
+
+        for i in range(len(ids)):
+            r = ids[i]
+            r = json.dumps(r)
+            loaded_r = json.loads(r)
+
+            if os.path.exists(os.getcwd()+os.path.sep+ "TrainingData" + os.path.sep + str(loaded_r['id'])+os.path.sep+"trainingData.yml"):
+                print("L1")
+                filepath=os.getcwd()+os.path.sep+ "TrainingData" + os.path.sep + str(loaded_r['id'])+os.path.sep+"trainingData.yml"
+                face_recognizer.read(filepath)
+                print("L2")
+                for face in faces_detected:
+                    (x, y, w, h) = face
+                    roi_gray = gray_img[y:y + h, x:x + h]
+                    label, confidence = face_recognizer.predict(roi_gray)  # predicting the label of given image
+                    if (confidence < 75):
+                        continue
+                    else:
+
+
+
+                        if datetime.datetime.today().weekday()==0 or datetime.datetime.today().weekday()==6:
+                            response = {'status': 'Failure', 'responseObject': None}
+                        else:
+                            att = Attendance()
+                            att.eid = label
+                            att.attendance = 1
+                            now = datetime.datetime.now()
+                            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+                            print("date and time:", date_time)
+                            att.datetime=date_time
+
+                            att.save()
+                            response = {'status': 'Present', 'responseObject': None}
+                        break
+
+                break
+    except Exception as e:
+        print("Exception is.:-"+str(e))
+        response = {'status': 'Failure', 'responseObject': None}
+        fp = os.path.join(os.path.abspath(os.getcwd())+os.path.sep+"Temp", "temp.jpg")
+    os.remove((os.path.abspath(os.getcwd())+os.path.sep+"Temp"+os.path.sep+"temp.jpg"))
+    os.rmdir(os.path.abspath(os.getcwd())+os.path.sep+"Temp")
+    return JsonResponse(response, safe=False)
 
 def getAttendance(request):
     data = list(Attendance.objects.values())
+    for i in range(len(data)):
+        data[i]['datetime']=data[i]['datetime'].strftime("%m/%d/%Y, %H:%M:%S")
     return JsonResponse(data, safe=False)
 
 
