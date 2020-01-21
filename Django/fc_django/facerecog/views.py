@@ -156,13 +156,17 @@ def savePhoto(request):
 
 @csrf_exempt
 def markAttendance(request):
+    print(request)
     response = {'status': 'Failure', 'responseObject': None}
+    conf = 0
+    cid = 0
     try:
 
         result=0
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
         arr = body_data['photo'].split(",")
+        print(arr[1])
         os.makedirs("Temp")
         fp=os.path.abspath(os.getcwd())+os.path.sep+"Temp"
         fp=os.path.join(fp, "temp.jpg")
@@ -179,42 +183,43 @@ def markAttendance(request):
             r = ids[i]
             r = json.dumps(r)
             loaded_r = json.loads(r)
-
+            print("ID",loaded_r['id'])
             if os.path.exists(os.getcwd()+os.path.sep+ "TrainingData" + os.path.sep + str(loaded_r['id'])+os.path.sep+"trainingData.yml"):
                 print("L1")
                 filepath=os.getcwd()+os.path.sep+ "TrainingData" + os.path.sep + str(loaded_r['id'])+os.path.sep+"trainingData.yml"
                 face_recognizer.read(filepath)
-                print("L2")
+                print("ID", loaded_r['id'])
                 for face in faces_detected:
                     (x, y, w, h) = face
                     roi_gray = gray_img[y:y + h, x:x + h]
                     label, confidence = face_recognizer.predict(roi_gray)  # predicting the label of given image
-                    if (confidence < 75):
-                        continue
+                    print("Confidence",confidence)
+
+                    if (datetime.datetime.today().weekday()==0 or datetime.datetime.today().weekday()==6):
+                        response = {'status': 'Failure', 'responseObject': None}
                     else:
+                        if conf==0 or conf>confidence:
+                            conf=confidence
+                            cid=loaded_r['id']
 
 
 
-                        if datetime.datetime.today().weekday()==0 or datetime.datetime.today().weekday()==6:
-                            response = {'status': 'Failure', 'responseObject': None}
-                        else:
-                            att = Attendance()
-                            att.eid = label
-                            att.attendance = 1
-                            now = datetime.datetime.now()
-                            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-                            print("date and time:", date_time)
-                            att.datetime=date_time
+        if cid!=0:
+            att = Attendance()
 
-                            att.save()
-                            response = {'status': 'Present', 'responseObject': None}
-                        break
+            att.eid = cid
+            att.attendance = 1
+            now = datetime.datetime.now()
+            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+            print("date and time:", date_time)
+            att.datetime = date_time
 
-                break
+            att.save()
+            response = {'status': 'Present', 'responseObject': None}
     except Exception as e:
         print("Exception is.:-"+str(e))
         response = {'status': 'Failure', 'responseObject': None}
-        fp = os.path.join(os.path.abspath(os.getcwd())+os.path.sep+"Temp", "temp.jpg")
+
     os.remove((os.path.abspath(os.getcwd())+os.path.sep+"Temp"+os.path.sep+"temp.jpg"))
     os.rmdir(os.path.abspath(os.getcwd())+os.path.sep+"Temp")
     return JsonResponse(response, safe=False)
@@ -222,7 +227,9 @@ def markAttendance(request):
 def getAttendance(request):
     data = list(Attendance.objects.values())
     for i in range(len(data)):
+        print("Created at %s:%s" % (data[i]['datetime'].hour, data[i]['datetime'].minute))
         data[i]['datetime']=data[i]['datetime'].strftime("%m/%d/%Y, %H:%M:%S")
+
     return JsonResponse(data, safe=False)
 
 
