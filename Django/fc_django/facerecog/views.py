@@ -206,7 +206,7 @@ def markAttendance(request):
 
         if cid!=0:
             att = Attendance()
-
+            print(EmpDetails.objects.get(id=cid).firstname+" is present")
             att.eid = cid
             att.attendance = 1
             now = datetime.datetime.now()
@@ -233,35 +233,55 @@ def getAttendance(request):
     return JsonResponse(data, safe=False)
 
 
+@csrf_exempt
 def getMonthlyReport(request):
     response = {'status': 'Failure', 'responseObject': None}
     try:
+        print("A1")
         body_unicode = request.body.decode('utf-8')
+
         body_data = json.loads(body_unicode)
-        attObj=Attendance.objects.get(eid=body_data['eid'])
+        attObj=[]
+        attObj=Attendance.objects.filter(eid=body_data['eid'])
         fname=EmpDetails.objects.get(id=body_data['eid']).firstname
         lname=EmpDetails.objects.get(id=body_data['eid']).lastname
+        print("A2")
         filename=os.getcwd()+os.path.sep+"Temp"+os.path.sep+fname+" "+lname+" "+"Monthly Attendace Report.xlsx"
+        os.mkdir(os.getcwd()+os.path.sep+"Temp")
         workbook = xlsxwriter.Workbook(filename)
-        cell_format = workbook.add_format({'bold': True, 'bg_color': 'grey'})
-        worksheet.write('Date','Attendance',cell_format)
-        today = datetime.datetime.today()
-        year=today.year
-        month=today.month
-        prdays=Attendance.objects.get(eid=body_data['eid'])
-        for i in range(len(prdays)):
-            prdays[i]=prdays[i]['datetime'].day
-        num_days = calendar.monthrange(year, month)[1]
-        for day in range(1, num_days + 1):
-            if day in prdays:
-                worksheet.write(datetime.datetime.strptime(day, "%m/%d/%Y"), 1)
-            else:
-                worksheet.write(datetime.datetime.strptime(day, "%m/%d/%Y"), 0)
+        worksheet = workbook.add_worksheet()
+        format = workbook.add_format()
+        format.set_bg_color('gray')
+        format.set_bold()
+        worksheet.write(0,0,"Date",format)
+        worksheet.write(0, 1, "Attendance", format)
+        worksheet.write(0, 2, "In-Time", format)
 
+        u=1
+        n=len(attObj)
+        print(attObj[0].datetime)
+        for i in range(n):
+
+            for j in range(3):
+                if j==0:
+                    date=attObj[u-1].datetime.strftime("%m/%d/%Y, %H:%M:%S")
+                    arr=date.split(",")
+                    worksheet.write(u, j,arr[0])
+                elif j==1:
+                    worksheet.write(u, j, 1)
+                elif j==2:
+                    date = attObj[u-1].datetime.strftime("%m/%d/%Y, %H:%M:%S")
+                    arr = date.split(",")
+                    worksheet.write(u, j, arr[1])
+            u=u+1
         workbook.close()
+
         data = open(filename, 'rb').read()
         base64_encoded = base64.b64encode(data).decode('UTF-8')
-        response = {'status': 'Success', 'responseObject': base64_encoded}
+        print(base64_encoded)
+        response = {'status': 'Success', 'filename': fname+" "+lname+" "+"Monthly Attendace Report.xlsx",'responseObject': base64_encoded}
+        os.remove(filename)
+        os.rmdir(os.getcwd()+os.path.sep+"Temp")
     except Exception as e:
         print("Exception.:-"+str(e))
 
