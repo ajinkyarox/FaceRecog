@@ -10,7 +10,8 @@ class EmpDetails(models.Model):
         db_table = "EmpDetails"
 
 class Attendance(models.Model):
-    eid = models.AutoField(primary_key=True)
+    id=models.AutoField(primary_key=True)
+    eid = models.IntegerField()
     attendance = models.IntegerField()
     datetime = models.DateTimeField(auto_now=True)
 

@@ -12,9 +12,9 @@ import cv2
 import numpy as np
 import re
 from re import search
-import datetime
+import datetime,calendar
 from datetime import date
-
+import xlsxwriter
 
 
 def homePageView(request):
@@ -198,7 +198,7 @@ def markAttendance(request):
                     if (datetime.datetime.today().weekday()==0 or datetime.datetime.today().weekday()==6):
                         response = {'status': 'Failure', 'responseObject': None}
                     else:
-                        if conf==0 or conf>confidence:
+                        if confidence<37:
                             conf=confidence
                             cid=loaded_r['id']
 
@@ -231,6 +231,41 @@ def getAttendance(request):
         data[i]['datetime']=data[i]['datetime'].strftime("%m/%d/%Y, %H:%M:%S")
 
     return JsonResponse(data, safe=False)
+
+
+def getMonthlyReport(request):
+    response = {'status': 'Failure', 'responseObject': None}
+    try:
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        attObj=Attendance.objects.get(eid=body_data['eid'])
+        fname=EmpDetails.objects.get(id=body_data['eid']).firstname
+        lname=EmpDetails.objects.get(id=body_data['eid']).lastname
+        filename=os.getcwd()+os.path.sep+"Temp"+os.path.sep+fname+" "+lname+" "+"Monthly Attendace Report.xlsx"
+        workbook = xlsxwriter.Workbook(filename)
+        cell_format = workbook.add_format({'bold': True, 'bg_color': 'grey'})
+        worksheet.write('Date','Attendance',cell_format)
+        today = datetime.datetime.today()
+        year=today.year
+        month=today.month
+        prdays=Attendance.objects.get(eid=body_data['eid'])
+        for i in range(len(prdays)):
+            prdays[i]=prdays[i]['datetime'].day
+        num_days = calendar.monthrange(year, month)[1]
+        for day in range(1, num_days + 1):
+            if day in prdays:
+                worksheet.write(datetime.datetime.strptime(day, "%m/%d/%Y"), 1)
+            else:
+                worksheet.write(datetime.datetime.strptime(day, "%m/%d/%Y"), 0)
+
+        workbook.close()
+        data = open(filename, 'rb').read()
+        base64_encoded = base64.b64encode(data).decode('UTF-8')
+        response = {'status': 'Success', 'responseObject': base64_encoded}
+    except Exception as e:
+        print("Exception.:-"+str(e))
+
+    return JsonResponse(response,safe=False)
 
 
 def faceDetection(test_img):

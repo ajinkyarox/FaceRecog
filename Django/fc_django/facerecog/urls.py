@@ -1,6 +1,6 @@
 # pages/urls.py
 from django.urls import path
-from .views import getEmpDetails,addEmployee,updateEmployee,deleteEmployee,savePhoto,markAttendance,getAttendance
+from .views import getEmpDetails,addEmployee,updateEmployee,deleteEmployee,savePhoto,markAttendance,getAttendance,getMonthlyReport
 from facerecog import views
 
 urlpatterns = [
@@ -11,7 +11,7 @@ urlpatterns = [
     path('deleteEmployee', deleteEmployee),
     path('savePhoto', savePhoto, name='savePhoto'),
     path('markAttendance',markAttendance,name='markAttendance'),
-    path('getAttendance',getAttendance,name='getAttendance')
-
+    path('getAttendance',getAttendance,name='getAttendance'),
+    path('getMonthlyReport',getMonthlyReport,name='getMonthlyReport')
 ]
 
