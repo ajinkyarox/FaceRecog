@@ -201,6 +201,7 @@ def markAttendance(request):
                         if confidence<37:
                             conf=confidence
                             cid=loaded_r['id']
+                            break
 
 
 
@@ -258,6 +259,7 @@ def getMonthlyReport(request):
         worksheet.write(0, 2, "In-Time", format)
 
         u=1
+
         n=len(attObj)
         print(attObj[0].datetime)
         for i in range(n):
@@ -278,13 +280,17 @@ def getMonthlyReport(request):
 
         data = open(filename, 'rb').read()
         base64_encoded = base64.b64encode(data).decode('UTF-8')
-        print(base64_encoded)
+
         response = {'status': 'Success', 'filename': fname+" "+lname+" "+"Monthly Attendace Report.xlsx",'responseObject': base64_encoded}
         os.remove(filename)
         os.rmdir(os.getcwd()+os.path.sep+"Temp")
     except Exception as e:
         print("Exception.:-"+str(e))
-
+        if os.path.exists(filename):
+            os.remove(filename)
+            os.rmdir(os.getcwd() + os.path.sep + "Temp")
+        if os.path.exists(os.getcwd()+os.path.sep+"Temp"):
+            os.rmdir(os.getcwd() + os.path.sep + "Temp")
     return JsonResponse(response,safe=False)
 
 

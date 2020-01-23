@@ -1,19 +1,28 @@
 import Attendance from './AttendanceDetails';
+import  EmployeeDetails  from  './EmployeeDetails';
 import React,{ Component } from  'react';
-//import { Base64 } from 'js-base64';
+import Popup from "reactjs-popup";
+
 
 const attendanceDetails=new Attendance();
-
+const  employeeDetails  =  new  EmployeeDetails();
+const techCompanies = [];
+  
 class AttendanceList extends Component{
 
 constructor(props){
     super(props)
     this.state = {
-        attendanceDetails:[]
+        attendanceDetails:[],
+        employeeDet: [],
+        
     };
 }
 
+
+
 getMonthlyReport(event,id){
+
     fetch('http://localhost:8000/getMonthlyReport', {
         method: 'POST',
         body: JSON.stringify({
@@ -26,16 +35,22 @@ getMonthlyReport(event,id){
        })
        .then((responseData) => { // responseData = undefined
         console.log(responseData.responseObject)
-        var data = new Blob([this.dataURItoBlob(responseData.responseObject)], {type: 'text/xlsx'});
-        var url = window.URL.createObjectURL(data);
-        var tempLink = document.createElement('a');
-tempLink.href = url;
-tempLink.setAttribute('download', responseData.filename);
-                
-tempLink.click();
+        if(responseData.responseObject===null || responseData.responseObject===undefined){
+            alert("Attendance Record not present.")
+        }
+        else{
+            var data = new Blob([this.dataURItoBlob(responseData.responseObject)], {type: 'text/xlsx'});
+            var url = window.URL.createObjectURL(data);
+            var tempLink = document.createElement('a');
+    tempLink.href = url;
+    tempLink.setAttribute('download', responseData.filename);
+                    
+    tempLink.click();
+        }
+        
            //window.open(tempLink)
            
-          
+         
            
            //return Base64.decode(responseData.responseObject);
        })
@@ -69,14 +84,49 @@ dataURItoBlob(b64Data) {
 componentDidMount() {
     var  self  =  this;
     attendanceDetails.getAttendanceDetails().then(function (result) {
-        console.log(result)
+        
         self.setState({ attendanceDetails:  result})
     });
+    employeeDetails.getEmployees().then(function (result) {
+            
+        self.setState({ employeeDet:  result})
+        
+    });
+     
+    
+     
+
 }
+test(){
+    for (let index = 0; index < this.state.employeeDet.length; index++) {
+        const element = this.state.employeeDet[index];
+        if(!techCompanies.includes({label:element.id,value:index})){
+            techCompanies.push({label:element.id,value:index})
+        }
+        
+       
+    }
+   
+}
+
 render(){
+    
     return(
     <div align="center">
-        
+         <Popup trigger={<button>Generate Monthly Report</button>}>
+             <div>
+        Select Employee ID 
+    <br></br>
+    <select name="country"  >
+    
+    {this.state.employeeDet.map((e, key) => {
+        return <option key={key} value={e.id} onClick={(event)=>this.getMonthlyReport(event,e.id)}>{e.firstname+" "+e.lastname}</option>;
+    })}
+</select>
+&nbsp;
+
+</div>
+         </Popup>
         <table  className="table">
         <thead  key="thead">
             <tr>
@@ -84,7 +134,7 @@ render(){
                 <th>Emp ID</th>
                 <th>Attendance</th>
                 <th>Date & Time</th>
-                <th>Monthly Report</th>
+                
             </tr>
             </thead>
             <tbody>
@@ -95,7 +145,7 @@ render(){
                     <td>{c.eid}</td>
                     <td>{c.attendance}</td>
                     <td>{c.datetime}</td>
-                    <td><button onClick={(e)=>this.getMonthlyReport(e,c.eid)}>Generate Monthly Report</button></td>
+                    
                 </tr>
 
                 )}

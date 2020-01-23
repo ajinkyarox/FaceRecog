@@ -221,13 +221,13 @@ handleInputLNameChange(event,id){
 
         return ( <div>
           <div align="center">
-          <Popup trigger={<button >Mark Attendace</button>}>
+          <Popup prefWidth="auto" maxHeight="auto" trigger={<button >Mark Attendace</button>}>
            <div>
            <Webcam audio={false}
         height={200}
         ref={this.setRef}
         screenshotFormat="image/jpeg"
-        width={200}
+        width={170}
         videoConstraints={videoConstraints}/><br></br>
         <button onClick={e=>this.markAttendace(e)}>Mark</button>
         </div>
@@ -304,7 +304,7 @@ handleInputLNameChange(event,id){
     componentDidMount() {
         var  self  =  this;
         employeeDetails.getEmployees().then(function (result) {
-            console.log(result)
+            
             self.setState({ employeeDet:  result})
         });
     }
