@@ -219,7 +219,7 @@ handleInputLNameChange(event,id){
 }
     render() {
 
-        return ( <div>
+        return ( <div align="center">
           <div align="center">
           <Popup prefWidth="auto" maxHeight="auto" trigger={<button >Mark Attendace</button>}>
            <div>
