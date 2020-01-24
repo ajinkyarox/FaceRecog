@@ -1,36 +1,31 @@
 import React from 'react';
-import {Navbar,Nav,Container} from 'react-bootstrap';
 import './App.css';
+import Login from './Login'
+import Main from './Main'
 import EmpList from './EmpList'
 import AttendanceList from './AttendanceList'
 import { BrowserRouter } from  'react-router-dom'
 import { Route } from  'react-router-dom'
+import {Navbar,Nav,Container} from 'react-bootstrap'
 
-const BaseLayout = () => (
+
+const LoginPage = () => (
   <div className="content">
-      <Route path="/EmpList" exact component={EmpList} />
-      <Route path="/AttendanceList" exact component={AttendanceList} />
+      
+
+      <Route path="" exact component={Login} />
+      
+     
     </div>
 )
-
 function App() {
   
   return (
-    <div>
+    <div align="center">
       <h1>FaceRecog</h1>
-      
+      <br></br><br></br><br></br>
       <BrowserRouter>
-      <Container>
-      <Navbar bg="primary" variant="dark">
-    
-    <Nav className="mr-auto">
-      <Nav.Link href="/EmpList">Employee List</Nav.Link>&nbsp; &nbsp;
-      <Nav.Link href="/AttendanceList">Attendance List</Nav.Link>
-    </Nav>
-    </Navbar>
-    </Container>
-
-        <BaseLayout/>
+       <LoginPage/>
       </BrowserRouter>
       
 
