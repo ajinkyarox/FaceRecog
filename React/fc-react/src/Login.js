@@ -4,7 +4,8 @@ import { Route,Redirect ,Link} from  'react-router-dom'
 import Modal from './LoginCred'
 import EmpList from './EmpList'
 import AttendanceList from './AttendanceList'
-
+import { Button } from 'react-bootstrap';
+import history from './history';
 
 const MainLayout = () => (
     <div className="content">
@@ -56,7 +57,7 @@ handleSubmit(e){
             this.setState({ navigate: true});
             localStorage.setItem('loginStatus',true)
             console.log(this.state.navigate)
-            
+            history.push('/Main')            
            }
            else{
             this.setState({ navigate: false});
@@ -108,7 +109,7 @@ showModal = e => {
             <div align="center">
                
        
-{this.state.navigate ? (<Main/>):(
+
 
     <div>
 
@@ -126,10 +127,10 @@ showModal = e => {
     
 
     <br></br><br></br>
-    <button onClick={ this.showModal}>Create Account</button>
+    <Button variant="btn btn-success" onClick={ this.showModal}>Create Account</Button>
 <Modal show={this.state.show}/>
         </div>
-)}
+
             </div>
         )
     }

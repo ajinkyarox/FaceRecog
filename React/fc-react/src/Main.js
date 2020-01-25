@@ -3,6 +3,7 @@ import EmpList from './EmpList'
 import AttendanceList from './AttendanceList'
 import { Route,withRouter, Redirect } from  'react-router-dom'
 import {Navbar,Nav,Container} from 'react-bootstrap'
+import history from './history';
 
 const EmpLayout = () => (
     <div className="content">
@@ -48,7 +49,8 @@ navToAttList(e){
 logout(e)
 {
    localStorage.setItem('loginStatus',false)
-   window.location.reload(true);
+   history.push('/')
+   
 }
 render(){
 
