@@ -31,11 +31,11 @@ class Main extends Component{
 changeEmpNavFlag(e){
     let flag=this.state.empflag
     this.setState({empflag:!flag})
-    this.setState({attflag:flag})
+    this.setState({attflag:false})
 }
 changeAttNavFlag(e){
     let flag=this.state.attflag
-    this.setState({empflag:flag})
+    this.setState({empflag:false})
     this.setState({attflag:!flag})
 }
 navToEmpList(e){
@@ -47,14 +47,15 @@ navToAttList(e){
 
 logout(e)
 {
-    return <Redirect to='/' />
+   localStorage.setItem('loginStatus',false)
+   window.location.reload(true);
 }
 render(){
 
     
     return(
     <div align="center">
-        <div align="left">
+        <div align="right">
             <button onClick={(e)=>{this.logout(e)}}>Logout</button>
         </div>
       <Container>

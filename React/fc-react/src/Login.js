@@ -23,15 +23,15 @@ class Login extends Component{
             show: false,
             navigate:false
         }
-        if (window.performance) {
+        /*if (window.performance) {
             if (performance.navigation.type == 1) {
               alert( "This page is reloaded"+this.state.navigate );
              
             } else {
               alert( "This page is not reloaded");
             }
-          }
-          this.onUnload = this.onUnload.bind(this);
+          }*/
+          //this.onUnload = this.onUnload.bind(this);
     }
    
 handleSubmit(e){
@@ -54,7 +54,7 @@ handleSubmit(e){
            alert(responseData.status);
            if(responseData.status==="Success"){
             this.setState({ navigate: true});
-            
+            localStorage.setItem('loginStatus',true)
             console.log(this.state.navigate)
             
            }
