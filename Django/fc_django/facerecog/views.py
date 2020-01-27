@@ -15,6 +15,7 @@ from re import search
 import datetime,calendar
 from datetime import date
 import xlsxwriter
+from cryptography.fernet import Fernet
 
 
 def homePageView(request):
@@ -308,6 +309,13 @@ def addLoginCredentials(request):
         if user==None:
             loginCred=LoginCredentials()
             loginCred.username=body_data['username']
+            key = Fernet.generate_key()
+            print(key)
+            cipher_suite = Fernet(key)
+            ciphered_text = cipher_suite.encrypt(body_data['password'])  # required to be bytes
+
+            print(ciphered_text)
+
             loginCred.password=body_data['password']
             loginCred.firstname=body_data['firstname']
             loginCred.lastname=body_data['lastname']
